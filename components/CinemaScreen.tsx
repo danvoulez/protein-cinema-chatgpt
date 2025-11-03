@@ -6,9 +6,18 @@ import { ProteinTheater } from './ProteinTheater'
 import { ManifestoView } from './ManifestoView'
 import { SessionReplay } from './SessionReplay'
 import { AnalysisDashboard } from './AnalysisDashboard'
+import type { SessionData } from '../lib/types'
 
-export function CinemaScreen({ activeTab, sessionData, isThinking }: any) {
-  const [displayedContent, setDisplayedContent] = useState<any>(null)
+type TabId = 'simulation' | 'analysis' | 'replay' | 'manifesto'
+
+interface CinemaScreenProps {
+  activeTab: TabId
+  sessionData: SessionData | null
+  isThinking: boolean
+}
+
+export function CinemaScreen({ activeTab, sessionData, isThinking }: CinemaScreenProps) {
+  const [thinkingEmoji, setThinkingEmoji] = useState<string>('🧬')
 
   // Efeitos visuais durante "pensamento"
   useEffect(() => {
@@ -16,24 +25,19 @@ export function CinemaScreen({ activeTab, sessionData, isThinking }: any) {
       const effects = ['🧬', '⚗️', '🔍', '📊', '🎯']
       let i = 0
       const interval = setInterval(() => {
-        setDisplayedContent({
-          type: 'thinking',
-          emoji: effects[i % effects.length]
-        })
+        setThinkingEmoji(effects[i % effects.length])
         i++
       }, 500)
       return () => clearInterval(interval)
-    } else {
-      setDisplayedContent(sessionData)
     }
-  }, [isThinking, sessionData])
+  }, [isThinking])
 
   const renderContent = () => {
     if (isThinking) {
       return (
         <div className="h-full flex items-center justify-center flex-col">
           <div className="text-6xl mb-4 animate-bounce">
-            {displayedContent?.emoji || '🧬'}
+            {thinkingEmoji}
           </div>
           <div className="text-xl text-gray-400 animate-pulse">
             LogLine Bio está realizando a simulação...

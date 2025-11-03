@@ -1,8 +1,18 @@
 // components/BottomMenu.tsx
 'use client'
 
-export function BottomMenu({ activeTab, onTabChange, sessionData }: any) {
-  const menuItems = [
+import type { SessionData } from '../lib/types'
+
+type TabId = 'simulation' | 'analysis' | 'replay' | 'manifesto'
+
+interface BottomMenuProps {
+  activeTab: TabId
+  onTabChange: (tab: TabId) => void
+  sessionData: SessionData | null
+}
+
+export function BottomMenu({ activeTab, onTabChange, sessionData }: BottomMenuProps) {
+  const menuItems: Array<{ id: TabId; icon: string; label: string; disabled: boolean }> = [
     { id: 'simulation', icon: '🧬', label: 'Simulação', disabled: false },
     { id: 'analysis', icon: '📊', label: 'Análise', disabled: !sessionData },
     { id: 'replay', icon: '🎥', label: 'Replay', disabled: !sessionData },

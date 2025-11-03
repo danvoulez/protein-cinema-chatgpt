@@ -1,19 +1,9 @@
 // components/ManifestoView.tsx
 'use client'
 
-interface ManifestoData {
-  sessionId: string
-  timestamp: string
-  participants: string[]
-  scientificQuestion: string
-  methodology: string[]
-  findings: any[]
-  conclusions: string[]
-  digitalSignature: string
-  auditTrail: string[]
-}
+import type { SessionData, ManifestoData } from '../lib/types'
 
-export function ManifestoView({ data }: { data: any }) {
+export function ManifestoView({ data }: { data: SessionData | null }) {
   const manifesto: ManifestoData = data?.manifesto || generateDefaultManifesto(data)
 
   return (
@@ -41,7 +31,7 @@ export function ManifestoView({ data }: { data: any }) {
         {/* Questão Científica */}
         <div className="mb-8 p-6 bg-gray-800/50 rounded-lg border-l-4 border-cyan-500">
           <div className="text-gray-400 text-sm mb-2">QUESTÃO INVESTIGADA</div>
-          <div className="text-white text-lg italic">"{manifesto.scientificQuestion}"</div>
+          <div className="text-white text-lg italic">&ldquo;{manifesto.scientificQuestion}&rdquo;</div>
         </div>
         
         {/* Metodologia */}
@@ -104,7 +94,7 @@ export function ManifestoView({ data }: { data: any }) {
   )
 }
 
-function generateDefaultManifesto(data: any): ManifestoData {
+function generateDefaultManifesto(data: SessionData | null): ManifestoData {
   return {
     sessionId: Date.now().toString(),
     timestamp: new Date().toISOString(),

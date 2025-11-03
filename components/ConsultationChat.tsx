@@ -5,6 +5,14 @@ import { useEffect, useRef, useState } from 'react'
 import type { SessionData, Message } from '../lib/types'
 import { niceId, samplePLDDT, signManifesto, sha256Base64 } from '../lib/manifest'
 
+const INITIAL_MESSAGE: Message = {
+  id: 'm0',
+  type: 'assistant',
+  content:
+    'Bem-vindo ao laboratório. Envie uma sequência FASTA ou descreva sua hipótese (ex: "simular mutação G12D").',
+  timestamp: new Date().toISOString()
+}
+
 export function ConsultationChat({
   onSessionUpdate,
   onThinkingState
@@ -12,21 +20,9 @@ export function ConsultationChat({
   onSessionUpdate: (s: SessionData) => void
   onThinkingState: (f: boolean) => void
 }) {
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE])
   const [input, setInput] = useState('')
   const listRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    setMessages([
-      {
-        id: 'm0',
-        type: 'assistant',
-        content:
-          'Bem-vindo ao laboratório. Envie uma sequência FASTA ou descreva sua hipótese (ex: "simular mutação G12D").',
-        timestamp: new Date().toISOString()
-      }
-    ])
-  }, [])
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
