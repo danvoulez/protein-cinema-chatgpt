@@ -4,11 +4,27 @@
 import { useEffect, useRef, useState } from 'react'
 import type { SessionData } from '../lib/types'
 
-declare global { interface Window { $3Dmol?: any } }
+declare global { 
+  interface Window { 
+    $3Dmol?: {
+      createViewer: (element: HTMLElement, config: { backgroundColor: string }) => Viewer3D
+    }
+  } 
+}
+
+interface Viewer3D {
+  addModel: (data: string, format: string) => void
+  setStyle: (selector: Record<string, unknown>, style: { cartoon: { colorscheme: string } }) => void
+  zoomTo: () => void
+  render: () => void
+  zoom: (factor: number) => void
+  isSpinning: () => boolean
+  spin: (axis: string, toggle: boolean) => void
+}
 
 export function ProteinTheater({ data }: { data?: SessionData | null }) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const viewerRef = useRef<any>(null)
+  const viewerRef = useRef<Viewer3D | null>(null)
   const [ready, setReady] = useState(false)
   const pdb = data?.models?.[0]?.content
 
@@ -31,7 +47,7 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
     async function init() {
       try {
         await ensure3Dmol()
-        if (!mounted || !window.$3Dmol || !containerRef.current) return
+        if (!mounted || !window.$3Dmol || !containerRef.current || !pdb) return
         const viewer = window.$3Dmol.createViewer(containerRef.current, {
           backgroundColor: 'black'
         })
@@ -51,17 +67,17 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
     // iOS Safari: prevenir zoom da página ao usar pinça no viewer
     const el = containerRef.current
     const stopDefault = (e: Event) => e.preventDefault()
-    el.addEventListener('gesturestart', stopDefault as any, { passive: false })
-    el.addEventListener('gesturechange', stopDefault as any, { passive: false })
-    el.addEventListener('gestureend', stopDefault as any, { passive: false })
+    el.addEventListener('gesturestart', stopDefault, { passive: false } as AddEventListenerOptions)
+    el.addEventListener('gesturechange', stopDefault, { passive: false } as AddEventListenerOptions)
+    el.addEventListener('gestureend', stopDefault, { passive: false } as AddEventListenerOptions)
 
     init()
 
     return () => {
       mounted = false
-      el.removeEventListener('gesturestart', stopDefault as any)
-      el.removeEventListener('gesturechange', stopDefault as any)
-      el.removeEventListener('gestureend', stopDefault as any)
+      el.removeEventListener('gesturestart', stopDefault)
+      el.removeEventListener('gesturechange', stopDefault)
+      el.removeEventListener('gestureend', stopDefault)
     }
   }, [pdb])
 

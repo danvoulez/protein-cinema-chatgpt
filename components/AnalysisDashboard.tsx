@@ -14,8 +14,8 @@ function Stat({ label, value, suffix = '' }: { label: string; value: string | nu
 }
 
 export function AnalysisDashboard({ data }: { data?: SessionData | null }) {
-  const p = data?.plddt ?? []
   const stats = useMemo(() => {
+    const p = data?.plddt ?? []
     if (!p.length) return null
     const min = Math.min(...p)
     const max = Math.max(...p)
@@ -26,7 +26,7 @@ export function AnalysisDashboard({ data }: { data?: SessionData | null }) {
       for (let i = 0; i < 4; i++) if (v >= bins[i] && v < bins[i + 1]) hist[i]++
     })
     return { min, max, mean, hist, bins }
-  }, [p])
+  }, [data?.plddt])
 
   if (!stats) {
     return (

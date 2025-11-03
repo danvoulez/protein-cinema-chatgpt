@@ -30,7 +30,6 @@ export function FloatingChat({ onSessionStart, isVisible }: {
       timestamp: new Date()
     }
   ])
-  const [input, setInput] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(true)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -44,11 +43,10 @@ export function FloatingChat({ onSessionStart, isVisible }: {
 
   const handleSuggestionClick = async (suggestion: string) => {
     setShowSuggestions(false)
-    setInput('')
     
     // Adiciona mensagem do usuário
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       type: 'user',
       content: suggestion,
       timestamp: new Date()
@@ -60,7 +58,7 @@ export function FloatingChat({ onSessionStart, isVisible }: {
     setTimeout(() => {
       const response = generateAssistantResponse(suggestion)
       const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: crypto.randomUUID(),
         type: 'assistant',
         content: response,
         timestamp: new Date()

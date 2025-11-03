@@ -5,9 +5,9 @@ import { useMemo, useState } from 'react'
 import type { SessionData } from '../lib/types'
 
 export function SessionReplay({ data }: { data?: SessionData | null }) {
-  const steps = data?.auditTrail ?? []
   const [idx, setIdx] = useState(0)
 
+  const steps = useMemo(() => data?.auditTrail ?? [], [data?.auditTrail])
   const current = useMemo(() => steps[idx] ?? 'Aguardando sessão…', [idx, steps])
 
   if (!steps.length) {

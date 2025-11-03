@@ -5,10 +5,13 @@ import { useState, useRef, useEffect } from 'react'
 import { ConsultationChat } from './ConsultationChat'
 import { CinemaScreen } from './CinemaScreen'
 import { BottomMenu } from './BottomMenu'
+import type { SessionData } from '../lib/types'
+
+type TabId = 'simulation' | 'analysis' | 'replay' | 'manifesto'
 
 export function ConsultationMode() {
-  const [activeTab, setActiveTab] = useState<'simulation' | 'manifesto' | 'replay' | 'analysis'>('simulation')
-  const [sessionData, setSessionData] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState<TabId>('simulation')
+  const [sessionData, setSessionData] = useState<SessionData | null>(null)
   const [isThinking, setIsThinking] = useState(false)
   
   const touchStart = useRef<number | null>(null)

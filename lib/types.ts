@@ -12,6 +12,18 @@ export type SimulationFinding = {
   evidence?: string
 }
 
+export type ManifestoData = {
+  sessionId: string
+  timestamp: string
+  participants: string[]
+  scientificQuestion: string
+  methodology: string[]
+  findings: SimulationFinding[]
+  conclusions: string[]
+  digitalSignature: string
+  auditTrail: string[]
+}
+
 export type SessionData = {
   sessionId: string
   startedAt: string
@@ -25,5 +37,5 @@ export type SessionData = {
     format: 'pdb' | 'cif'
     content: string
   }>
-  manifesto?: any
+  manifesto?: ManifestoData
 }
