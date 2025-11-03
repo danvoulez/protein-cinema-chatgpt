@@ -42,8 +42,12 @@ export async function sha256Hash(payload: string): Promise<string> {
 }
 
 /**
- * Simple fallback hash function (not cryptographically secure)
+ * Simple fallback hash function (NOT cryptographically secure)
  * Only used when Web Crypto API is not available
+ * 
+ * WARNING: This is a simple hash for data integrity checking only.
+ * It should NOT be used for security-critical operations.
+ * The hash includes a timestamp to ensure uniqueness but is still predictable.
  */
 function fallbackHash(str: string): string {
   let hash = 0
@@ -52,6 +56,8 @@ function fallbackHash(str: string): string {
     hash = ((hash << 5) - hash) + char
     hash = hash & hash // Convert to 32bit integer
   }
-  // Convert to base64-like string
-  return btoa(hash.toString(36) + '-fallback-' + Date.now().toString(36))
+  // Convert to base64-like string with timestamp for uniqueness
+  const timestamp = Date.now().toString(36)
+  const hashStr = Math.abs(hash).toString(36)
+  return btoa(`fallback-${hashStr}-${timestamp}`)
 }

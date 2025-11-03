@@ -20,6 +20,7 @@ export function sanitizeMarkdown(text: string): string {
 
 /**
  * Validate and sanitize user input
+ * @throws Error if input exceeds maximum length
  */
 export function sanitizeUserInput(input: string): string {
   // Trim whitespace
@@ -27,7 +28,7 @@ export function sanitizeUserInput(input: string): string {
   
   // Limit length to prevent abuse
   if (trimmed.length > MAX_INPUT_LENGTH) {
-    return trimmed.substring(0, MAX_INPUT_LENGTH)
+    throw new Error(`Input exceeds maximum length of ${MAX_INPUT_LENGTH} characters`)
   }
   
   return trimmed

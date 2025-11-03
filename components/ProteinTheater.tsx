@@ -99,7 +99,15 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
 
     // Keyboard controls for accessibility
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target !== document.body) return // Only when not in input
+      // Skip if user is typing in an input field
+      const target = e.target as HTMLElement
+      if (
+        target.tagName === 'INPUT' || 
+        target.tagName === 'TEXTAREA' || 
+        target.isContentEditable
+      ) {
+        return
+      }
       
       switch(e.key) {
         case '+':

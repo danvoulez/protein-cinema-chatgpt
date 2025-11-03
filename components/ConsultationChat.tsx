@@ -32,16 +32,32 @@ export function ConsultationChat({
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages])
 
-  // Focus input after simulation completes
+  // Focus input after messages change
   useEffect(() => {
-    if (!onThinkingState && inputRef.current) {
+    if (inputRef.current && messages.length > 1) {
+      // Small delay to ensure DOM updates
       setTimeout(() => inputRef.current?.focus(), 100)
     }
-  }, [onThinkingState])
+  }, [messages])
 
   async function handleSend() {
-    const trimmed = sanitizeUserInput(input)
+    let trimmed: string
+    try {
+      trimmed = sanitizeUserInput(input)
+    } catch (error) {
+      // Show error to user if input is too long
+      const errorMsg: Message = {
+        id: generateUUID(),
+        type: 'assistant',
+        content: error instanceof Error ? error.message : 'Erro ao validar entrada',
+        timestamp: new Date().toISOString()
+      }
+      setMessages((m) => [...m, errorMsg])
+      return
+    }
+    
     if (!trimmed) return
+    
     const userMsg: Message = {
       id: generateUUID(),
       type: 'user',
