@@ -74,6 +74,36 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
     el.addEventListener('gesturechange', stopDefault, eventOptions)
     el.addEventListener('gestureend', stopDefault, eventOptions)
 
+    // Keyboard controls for accessibility
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target !== document.body) return // Only when not in input
+      
+      switch(e.key) {
+        case '+':
+        case '=':
+          e.preventDefault()
+          zoom(ZOOM_STEP)
+          break
+        case '-':
+        case '_':
+          e.preventDefault()
+          zoom(1 / ZOOM_STEP)
+          break
+        case 'r':
+        case 'R':
+          e.preventDefault()
+          reset()
+          break
+        case 's':
+        case 'S':
+          e.preventDefault()
+          spin()
+          break
+      }
+    }
+    
+    window.addEventListener('keydown', handleKeyDown)
+
     init()
 
     return () => {
@@ -81,6 +111,7 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
       el.removeEventListener('gesturestart', stopDefault)
       el.removeEventListener('gesturechange', stopDefault)
       el.removeEventListener('gestureend', stopDefault)
+      window.removeEventListener('keydown', handleKeyDown)
     }
   }, [pdb])
 
@@ -138,10 +169,13 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
         </div>
       )}
 
-      {/* Overlay com metadados */}
+      {/* Overlay com metadados e keyboard shortcuts */}
       <div className="absolute left-3 bottom-3 text-xs text-gray-300 bg-black/50 px-3 py-2 rounded-lg border border-white/10 pointer-events-none">
         <div>Sessão: <span className="font-mono">{data?.sessionId ?? '-'}</span></div>
         <div>Confiança (pLDDT médio): <span className="font-semibold">{data?.confidence?.overall ?? '—'}%</span></div>
+        <div className="mt-2 pt-2 border-t border-white/10 text-gray-400">
+          <div>Atalhos: +/- zoom • R reset • S spin</div>
+        </div>
       </div>
 
       {/* Botões de controle (fallback para quem preferir tocar em botões) */}
