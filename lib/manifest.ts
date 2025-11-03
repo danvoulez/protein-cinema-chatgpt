@@ -1,11 +1,17 @@
 // lib/manifest.ts
+import { sha256Hash } from './crypto-utils'
+import { 
+  DEFAULT_PLDDT_LENGTH, 
+  PLDDT_BASE, 
+  PLDDT_AMPLITUDE, 
+  PLDDT_FREQUENCY, 
+  PLDDT_NOISE_RANGE, 
+  PLDDT_MIN, 
+  PLDDT_MAX 
+} from './constants'
+
 export async function sha256Base64(payload: string): Promise<string> {
-  const enc = new TextEncoder().encode(payload)
-  const buf = await crypto.subtle.digest('SHA-256', enc)
-  const bytes = new Uint8Array(buf)
-  let binary = ''
-  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i])
-  return btoa(binary)
+  return sha256Hash(payload)
 }
 
 export async function signManifesto(payload: object): Promise<string> {
@@ -16,16 +22,17 @@ export async function signManifesto(payload: object): Promise<string> {
 }
 
 export function niceId(prefix = 'PT'): string {
+  // Use timestamp + random for uniqueness
   return `${prefix}-${Math.random().toString(36).slice(2, 6)}-${Date.now().toString(36)}`
 }
 
-export function samplePLDDT(len = 120): number[] {
+export function samplePLDDT(len = DEFAULT_PLDDT_LENGTH): number[] {
   // Gera curva pLDDT plausível 60–95 com ruído
   const out: number[] = []
   for (let i = 0; i < len; i++) {
-    const base = 78 + 15 * Math.sin(i / 13)
-    const noise = (Math.random() - 0.5) * 8
-    out.push(Math.max(40, Math.min(98, Math.round(base + noise))))
+    const base = PLDDT_BASE + PLDDT_AMPLITUDE * Math.sin(i / PLDDT_FREQUENCY)
+    const noise = (Math.random() - 0.5) * PLDDT_NOISE_RANGE
+    out.push(Math.max(PLDDT_MIN, Math.min(PLDDT_MAX, Math.round(base + noise))))
   }
   return out
 }

@@ -12,7 +12,7 @@ export function SessionReplay({ data }: { data?: SessionData | null }) {
 
   if (!steps.length) {
     return (
-      <div className="h-full flex items-center justify-center text-gray-500">
+      <div className="h-full flex items-center justify-center text-gray-300">
         Nenhum evento ainda. Rode uma simulação para habilitar o replay.
       </div>
     )

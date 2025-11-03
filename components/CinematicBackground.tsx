@@ -2,15 +2,28 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { MAX_STARS, STARS_PER_WIDTH_UNIT, MIN_STAR_SIZE, MAX_STAR_SIZE, PARALLAX_MIN, PARALLAX_MAX } from '../lib/constants'
 
 export function CinematicBackground({ active = true }: { active?: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const rafRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
-    if (!active) return
-    const canvas = canvasRef.current!
-    const ctx = canvas.getContext('2d')!
+    if (!active) {
+      // Clean up animation if component is inactive
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current)
+        rafRef.current = undefined
+      }
+      return
+    }
+    
+    const canvas = canvasRef.current
+    if (!canvas) return
+    
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    
     let w = (canvas.width = window.innerWidth)
     let h = (canvas.height = window.innerHeight)
     const onResize = () => {
@@ -20,11 +33,11 @@ export function CinematicBackground({ active = true }: { active?: boolean }) {
     window.addEventListener('resize', onResize)
 
     type Star = { x: number; y: number; z: number; s: number }
-    const stars: Star[] = Array.from({ length: Math.min(250, Math.floor(w / 6)) }, () => ({
+    const stars: Star[] = Array.from({ length: Math.min(MAX_STARS, Math.floor(w / STARS_PER_WIDTH_UNIT)) }, () => ({
       x: Math.random() * w,
       y: Math.random() * h,
-      z: Math.random() * 0.5 + 0.5,
-      s: Math.random() * 1.5 + 0.3
+      z: Math.random() * (PARALLAX_MAX - PARALLAX_MIN) + PARALLAX_MIN,
+      s: Math.random() * (MAX_STAR_SIZE - MIN_STAR_SIZE) + MIN_STAR_SIZE
     }))
 
     const gradient = ctx.createLinearGradient(0, 0, w, h)
@@ -59,7 +72,10 @@ export function CinematicBackground({ active = true }: { active?: boolean }) {
 
     return () => {
       window.removeEventListener('resize', onResize)
-      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current)
+        rafRef.current = undefined
+      }
     }
   }, [active])
 

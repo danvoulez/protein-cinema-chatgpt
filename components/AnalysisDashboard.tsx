@@ -3,6 +3,7 @@
 
 import { useMemo } from 'react'
 import type { SessionData } from '../lib/types'
+import { PLDDT_BINS, PLDDT_LABELS } from '../lib/constants'
 
 function Stat({ label, value, suffix = '' }: { label: string; value: string | number; suffix?: string }) {
   return (
@@ -20,24 +21,26 @@ export function AnalysisDashboard({ data }: { data?: SessionData | null }) {
     const min = Math.min(...p)
     const max = Math.max(...p)
     const mean = Math.round(p.reduce((a, b) => a + b, 0) / p.length)
-    const bins = [0, 50, 70, 90, 100]
-    const hist = Array(4).fill(0)
+    const bins = PLDDT_BINS
+    const hist = Array(bins.length - 1).fill(0)
     p.forEach((v) => {
-      for (let i = 0; i < 4; i++) if (v >= bins[i] && v < bins[i + 1]) hist[i]++
+      for (let i = 0; i < bins.length - 1; i++) {
+        if (v >= bins[i] && v < bins[i + 1]) hist[i]++
+      }
     })
     return { min, max, mean, hist, bins }
   }, [data?.plddt])
 
   if (!stats) {
     return (
-      <div className="h-full flex items-center justify-center text-gray-500">
+      <div className="h-full flex items-center justify-center text-gray-300">
         Rode uma simulação para ver as métricas.
       </div>
     )
   }
 
   const total = (data?.plddt?.length ?? 1)
-  const labels = ['<50', '50–69', '70–89', '90–100']
+  const labels = PLDDT_LABELS
 
   return (
     <div className="h-full overflow-y-auto p-4 space-y-4">

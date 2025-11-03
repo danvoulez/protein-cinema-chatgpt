@@ -2,13 +2,10 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-
-interface Message {
-  id: string
-  type: 'user' | 'assistant'
-  content: string
-  timestamp: Date
-}
+import { sanitizeMarkdown } from '../lib/sanitize'
+import { generateUUID } from '../lib/crypto-utils'
+import { ASSISTANT_RESPONSE_DELAY_MS, SESSION_START_DELAY_MS } from '../lib/constants'
+import type { Message } from '../lib/types'
 
 const INITIAL_SUGGESTIONS = [
   "🧬 Quero prever uma estrutura proteica nova",
@@ -27,7 +24,7 @@ export function FloatingChat({ onSessionStart, isVisible }: {
       id: '1',
       type: 'assistant',
       content: "Olá! Sou o **LogLine Bio**, seu assistente no Teatro da Descoberta. Sou um biólogo computacional especializado em tornar a complexidade proteica acessível e fascinante. Como posso guiar sua exploração científica hoje?",
-      timestamp: new Date()
+      timestamp: new Date().toISOString()
     }
   ])
   const [showSuggestions, setShowSuggestions] = useState(true)
@@ -46,10 +43,10 @@ export function FloatingChat({ onSessionStart, isVisible }: {
     
     // Adiciona mensagem do usuário
     const userMessage: Message = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       type: 'user',
       content: suggestion,
-      timestamp: new Date()
+      timestamp: new Date().toISOString()
     }
     
     setMessages(prev => [...prev, userMessage])
@@ -58,19 +55,19 @@ export function FloatingChat({ onSessionStart, isVisible }: {
     setTimeout(() => {
       const response = generateAssistantResponse(suggestion)
       const assistantMessage: Message = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         type: 'assistant',
         content: response,
-        timestamp: new Date()
+        timestamp: new Date().toISOString()
       }
       
       setMessages(prev => [...prev, assistantMessage])
       
       // Inicia sessão para certos tipos de consulta
       if (suggestion.includes('prever') || suggestion.includes('simular') || suggestion.includes('mutação')) {
-        setTimeout(onSessionStart, 1500)
+        setTimeout(onSessionStart, SESSION_START_DELAY_MS)
       }
-    }, 1000)
+    }, ASSISTANT_RESPONSE_DELAY_MS)
   }
 
   const generateAssistantResponse = (userInput: string): string => {
@@ -115,9 +112,9 @@ export function FloatingChat({ onSessionStart, isVisible }: {
                 }`}
               >
                 <div className="text-sm whitespace-pre-wrap" 
-                     dangerouslySetInnerHTML={{ __html: message.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+                     dangerouslySetInnerHTML={{ __html: sanitizeMarkdown(message.content) }} />
                 <div className="text-xs opacity-60 mt-1">
-                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
             </div>

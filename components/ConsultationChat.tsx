@@ -4,6 +4,9 @@
 import { useEffect, useRef, useState } from 'react'
 import type { SessionData, Message } from '../lib/types'
 import { niceId, samplePLDDT, signManifesto, sha256Base64 } from '../lib/manifest'
+import { sanitizeMarkdown, sanitizeUserInput } from '../lib/sanitize'
+import { generateUUID } from '../lib/crypto-utils'
+import { SIMULATION_DELAY_MS } from '../lib/constants'
 
 const INITIAL_MESSAGE: Message = {
   id: 'm0',
@@ -23,16 +26,40 @@ export function ConsultationChat({
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE])
   const [input, setInput] = useState('')
   const listRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages])
 
+  // Focus input after messages change
+  useEffect(() => {
+    if (inputRef.current && messages.length > 1) {
+      // Small delay to ensure DOM updates
+      setTimeout(() => inputRef.current?.focus(), 100)
+    }
+  }, [messages])
+
   async function handleSend() {
-    const trimmed = input.trim()
+    let trimmed: string
+    try {
+      trimmed = sanitizeUserInput(input)
+    } catch (error) {
+      // Show error to user if input is too long
+      const errorMsg: Message = {
+        id: generateUUID(),
+        type: 'assistant',
+        content: error instanceof Error ? error.message : 'Erro ao validar entrada',
+        timestamp: new Date().toISOString()
+      }
+      setMessages((m) => [...m, errorMsg])
+      return
+    }
+    
     if (!trimmed) return
+    
     const userMsg: Message = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       type: 'user',
       content: trimmed,
       timestamp: new Date().toISOString()
@@ -116,7 +143,7 @@ TER`
       setMessages((m) => [
         ...m,
         {
-          id: crypto.randomUUID(),
+          id: generateUUID(),
           type: 'assistant',
           content:
             'Simulação concluída. Ative as abas **Análise**, **Replay** ou **Manifesto** para explorar os resultados.',
@@ -125,7 +152,7 @@ TER`
       ])
       onSessionUpdate(session)
       onThinkingState(false)
-    }, 1500)
+    }, SIMULATION_DELAY_MS)
   }
 
   return (
@@ -142,7 +169,7 @@ TER`
                 m.type === 'user' ? 'bg-cyan-600 text-white rounded-br-none' : 'bg-gray-800 text-gray-100 rounded-bl-none'
               }`}
               dangerouslySetInnerHTML={{
-                __html: m.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                __html: sanitizeMarkdown(m.content)
               }}
             />
           </div>
@@ -158,10 +185,11 @@ TER`
         aria-label="Enviar mensagem"
       >
         <input
+          ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Descreva a hipótese ou cole FASTA..."
-          className="flex-1 bg-gray-900 text-gray-100 rounded-xl px-3 py-2 outline-none border border-gray-700 focus:border-cyan-500"
+          className="flex-1 bg-gray-900 text-gray-100 rounded-xl px-3 py-2 outline-none border border-gray-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
           aria-label="Campo de entrada do chat"
         />
         <button
