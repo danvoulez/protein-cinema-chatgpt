@@ -20,12 +20,14 @@ export function BottomMenu({ activeTab, onTabChange, sessionData }: BottomMenuPr
   ]
 
   return (
-    <div className="flex justify-around items-center h-16 bg-black border-t border-gray-800 px-4">
+    <div className="flex justify-around items-center h-16 bg-black border-t border-gray-800 px-4" role="navigation" aria-label="Menu de navegação principal">
       {menuItems.map((item) => (
         <button
           key={item.id}
           onClick={() => !item.disabled && onTabChange(item.id)}
           disabled={item.disabled}
+          aria-label={`${item.label}${item.disabled ? ' (indisponível)' : ''}`}
+          aria-current={activeTab === item.id ? 'page' : undefined}
           className={`flex flex-col items-center justify-center flex-1 max-w-[80px] transition-all ${
             activeTab === item.id 
               ? 'text-cyan-400 scale-110' 
@@ -34,7 +36,7 @@ export function BottomMenu({ activeTab, onTabChange, sessionData }: BottomMenuPr
                 : 'text-gray-400 hover:text-white'
           }`}
         >
-          <div className="text-2xl mb-1">{item.icon}</div>
+          <div className="text-2xl mb-1" aria-hidden="true">{item.icon}</div>
           <div className="text-xs font-medium">{item.label}</div>
         </button>
       ))}

@@ -4,6 +4,9 @@
 import { useEffect, useRef, useState } from 'react'
 import type { SessionData, Message } from '../lib/types'
 import { niceId, samplePLDDT, signManifesto, sha256Base64 } from '../lib/manifest'
+import { sanitizeMarkdown, sanitizeUserInput } from '../lib/sanitize'
+import { generateUUID } from '../lib/crypto-utils'
+import { SIMULATION_DELAY_MS } from '../lib/constants'
 
 const INITIAL_MESSAGE: Message = {
   id: 'm0',
@@ -29,10 +32,10 @@ export function ConsultationChat({
   }, [messages])
 
   async function handleSend() {
-    const trimmed = input.trim()
+    const trimmed = sanitizeUserInput(input)
     if (!trimmed) return
     const userMsg: Message = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       type: 'user',
       content: trimmed,
       timestamp: new Date().toISOString()
@@ -116,7 +119,7 @@ TER`
       setMessages((m) => [
         ...m,
         {
-          id: crypto.randomUUID(),
+          id: generateUUID(),
           type: 'assistant',
           content:
             'Simulação concluída. Ative as abas **Análise**, **Replay** ou **Manifesto** para explorar os resultados.',
@@ -125,7 +128,7 @@ TER`
       ])
       onSessionUpdate(session)
       onThinkingState(false)
-    }, 1500)
+    }, SIMULATION_DELAY_MS)
   }
 
   return (
@@ -142,7 +145,7 @@ TER`
                 m.type === 'user' ? 'bg-cyan-600 text-white rounded-br-none' : 'bg-gray-800 text-gray-100 rounded-bl-none'
               }`}
               dangerouslySetInnerHTML={{
-                __html: m.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                __html: sanitizeMarkdown(m.content)
               }}
             />
           </div>

@@ -7,6 +7,7 @@ import { ManifestoView } from './ManifestoView'
 import { SessionReplay } from './SessionReplay'
 import { AnalysisDashboard } from './AnalysisDashboard'
 import type { SessionData } from '../lib/types'
+import { THINKING_ANIMATION_INTERVAL_MS } from '../lib/constants'
 
 type TabId = 'simulation' | 'analysis' | 'replay' | 'manifesto'
 
@@ -27,7 +28,7 @@ export function CinemaScreen({ activeTab, sessionData, isThinking }: CinemaScree
       const interval = setInterval(() => {
         setThinkingEmoji(effects[i % effects.length])
         i++
-      }, 500)
+      }, THINKING_ANIMATION_INTERVAL_MS)
       return () => clearInterval(interval)
     }
   }, [isThinking])

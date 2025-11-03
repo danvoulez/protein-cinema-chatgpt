@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { SessionData } from '../lib/types'
+import { ZOOM_STEP, ZOOM_WHEEL_STEP } from '../lib/constants'
 
 declare global { 
   interface Window { 
@@ -59,7 +60,8 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
         // Guarda referência pra controles manuais (fallback)
         viewerRef.current = viewer
         setReady(true)
-      } catch {
+      } catch (error) {
+        console.error('Failed to initialize 3Dmol viewer:', error)
         setReady(false)
       }
     }
@@ -67,9 +69,10 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
     // iOS Safari: prevenir zoom da página ao usar pinça no viewer
     const el = containerRef.current
     const stopDefault = (e: Event) => e.preventDefault()
-    el.addEventListener('gesturestart', stopDefault, { passive: false } as AddEventListenerOptions)
-    el.addEventListener('gesturechange', stopDefault, { passive: false } as AddEventListenerOptions)
-    el.addEventListener('gestureend', stopDefault, { passive: false } as AddEventListenerOptions)
+    const eventOptions: AddEventListenerOptions = { passive: false }
+    el.addEventListener('gesturestart', stopDefault, eventOptions)
+    el.addEventListener('gesturechange', stopDefault, eventOptions)
+    el.addEventListener('gestureend', stopDefault, eventOptions)
 
     init()
 
@@ -82,7 +85,7 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
   }, [pdb])
 
   // Fallbacks de acessibilidade/teclado/mouse
-  function zoom(step = 1.2) {
+  function zoom(step = ZOOM_STEP) {
     const v = viewerRef.current
     if (!v) return
     v.zoom(step)
@@ -125,7 +128,7 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
         // fallback: roda do mouse = zoom
         onWheel={(e) => {
           e.preventDefault()
-          zoom(e.deltaY < 0 ? 1.1 : 1 / 1.1)
+          zoom(e.deltaY < 0 ? ZOOM_WHEEL_STEP : 1 / ZOOM_WHEEL_STEP)
         }}
       />
 
@@ -143,10 +146,10 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
 
       {/* Botões de controle (fallback para quem preferir tocar em botões) */}
       <div className="absolute right-3 bottom-3 flex flex-col gap-2">
-        <button onClick={() => zoom(1.15)} className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20">＋ Zoom</button>
-        <button onClick={() => zoom(1/1.15)} className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20">－ Zoom</button>
-        <button onClick={() => spin()} className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20">⟳ Spin</button>
-        <button onClick={reset} className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20">⤾ Reset</button>
+        <button onClick={() => zoom(ZOOM_STEP)} className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20" aria-label="Aumentar zoom">＋ Zoom</button>
+        <button onClick={() => zoom(1/ZOOM_STEP)} className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20" aria-label="Diminuir zoom">－ Zoom</button>
+        <button onClick={() => spin()} className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20" aria-label="Rotacionar automaticamente">⟳ Spin</button>
+        <button onClick={reset} className="px-3 py-2 bg-white/10 text-white rounded-lg border border-white/20" aria-label="Resetar visualização">⤾ Reset</button>
       </div>
     </div>
   )

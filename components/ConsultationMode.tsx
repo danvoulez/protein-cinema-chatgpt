@@ -6,6 +6,7 @@ import { ConsultationChat } from './ConsultationChat'
 import { CinemaScreen } from './CinemaScreen'
 import { BottomMenu } from './BottomMenu'
 import type { SessionData } from '../lib/types'
+import { MIN_SWIPE_DISTANCE } from '../lib/constants'
 
 type TabId = 'simulation' | 'analysis' | 'replay' | 'manifesto'
 
@@ -30,7 +31,7 @@ export function ConsultationMode() {
   function onTouchEnd(e: React.TouchEvent) {
     if (touchStart.current == null) return
     const dx = e.changedTouches[0].clientX - touchStart.current
-    if (Math.abs(dx) < 60) return
+    if (Math.abs(dx) < MIN_SWIPE_DISTANCE) return
     const dir = dx < 0 ? 1 : -1
     const i = tabs.indexOf(activeTab)
     const next = Math.min(tabs.length - 1, Math.max(0, i + dir))

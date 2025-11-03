@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { FloatingChat } from '../../../components/FloatingChat'
 import { CinematicBackground } from '../../../components/CinematicBackground'
 import { ConsultationMode } from '../../../components/ConsultationMode'
+import { CHAT_SHOW_DELAY_MS } from '../../../lib/constants'
 
 export default function LandingPage() {
   const [sessionStarted, setSessionStarted] = useState(false)
@@ -12,7 +13,7 @@ export default function LandingPage() {
 
   // Efeito cinematográfico de entrada
   useEffect(() => {
-    const timer = setTimeout(() => setShowChat(true), 2000)
+    const timer = setTimeout(() => setShowChat(true), CHAT_SHOW_DELAY_MS)
     return () => clearTimeout(timer)
   }, [])
 
