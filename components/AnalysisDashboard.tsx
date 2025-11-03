@@ -33,7 +33,7 @@ export function AnalysisDashboard({ data }: { data?: SessionData | null }) {
 
   if (!stats) {
     return (
-      <div className="h-full flex items-center justify-center text-gray-500">
+      <div className="h-full flex items-center justify-center text-gray-300">
         Rode uma simulação para ver as métricas.
       </div>
     )

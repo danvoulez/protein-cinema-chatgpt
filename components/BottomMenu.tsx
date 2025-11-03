@@ -32,8 +32,8 @@ export function BottomMenu({ activeTab, onTabChange, sessionData }: BottomMenuPr
             activeTab === item.id 
               ? 'text-cyan-400 scale-110' 
               : item.disabled 
-                ? 'text-gray-600 cursor-not-allowed' 
-                : 'text-gray-400 hover:text-white'
+                ? 'text-gray-700 cursor-not-allowed opacity-50' 
+                : 'text-gray-300 hover:text-white'
           }`}
         >
           <div className="text-2xl mb-1" aria-hidden="true">{item.icon}</div>

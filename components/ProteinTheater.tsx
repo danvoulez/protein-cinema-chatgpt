@@ -1,7 +1,7 @@
 // components/ProteinTheater.tsx
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import type { SessionData } from '../lib/types'
 import { ZOOM_STEP, ZOOM_WHEEL_STEP } from '../lib/constants'
 
@@ -28,6 +28,29 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
   const viewerRef = useRef<Viewer3D | null>(null)
   const [ready, setReady] = useState(false)
   const pdb = data?.models?.[0]?.content
+
+  // Fallbacks de acessibilidade/teclado/mouse
+  const zoom = useCallback((step = ZOOM_STEP) => {
+    const v = viewerRef.current
+    if (!v) return
+    v.zoom(step)
+    v.render()
+  }, [])
+  
+  const reset = useCallback(() => {
+    const v = viewerRef.current
+    if (!v) return
+    v.zoomTo()
+    v.render()
+  }, [])
+  
+  const spin = useCallback((toggle?: boolean) => {
+    const v = viewerRef.current
+    if (!v) return
+    // liga/desliga rotação automática
+    v.spin('y', toggle ?? !v.isSpinning())
+    v.render()
+  }, [])
 
   useEffect(() => {
     if (!containerRef.current || !pdb) return
@@ -113,32 +136,11 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
       el.removeEventListener('gestureend', stopDefault)
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [pdb])
-
-  // Fallbacks de acessibilidade/teclado/mouse
-  function zoom(step = ZOOM_STEP) {
-    const v = viewerRef.current
-    if (!v) return
-    v.zoom(step)
-    v.render()
-  }
-  function reset() {
-    const v = viewerRef.current
-    if (!v) return
-    v.zoomTo()
-    v.render()
-  }
-  function spin(toggle?: boolean) {
-    const v = viewerRef.current
-    if (!v) return
-    // liga/desliga rotação automática
-    v.spin('y', toggle ?? !v.isSpinning())
-    v.render()
-  }
+  }, [pdb, zoom, reset, spin])
 
   if (!pdb) {
     return (
-      <div className="h-full flex items-center justify-center text-gray-500">
+      <div className="h-full flex items-center justify-center text-gray-300">
         <div className="text-center">
           <div className="text-5xl mb-3">🧪</div>
           <div>Inicie uma simulação para visualizar a estrutura 3D.</div>
@@ -164,7 +166,7 @@ export function ProteinTheater({ data }: { data?: SessionData | null }) {
       />
 
       {!ready && (
-        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+        <div className="absolute inset-0 flex items-center justify-center text-gray-200">
           <div className="animate-pulse">Carregando visualizador 3D…</div>
         </div>
       )}

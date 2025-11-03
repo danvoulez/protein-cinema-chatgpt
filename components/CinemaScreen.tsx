@@ -40,10 +40,10 @@ export function CinemaScreen({ activeTab, sessionData, isThinking }: CinemaScree
           <div className="text-6xl mb-4 animate-bounce">
             {thinkingEmoji}
           </div>
-          <div className="text-xl text-gray-400 animate-pulse">
+          <div className="text-xl text-gray-200 animate-pulse">
             LogLine Bio está realizando a simulação...
           </div>
-          <div className="text-sm text-gray-600 mt-2">
+          <div className="text-sm text-gray-400 mt-2">
             Cada passo está sendo auditado e registrado
           </div>
         </div>
@@ -61,7 +61,7 @@ export function CinemaScreen({ activeTab, sessionData, isThinking }: CinemaScree
         return <AnalysisDashboard data={sessionData} />
       default:
         return (
-          <div className="h-full flex items-center justify-center text-gray-500">
+          <div className="h-full flex items-center justify-center text-gray-300">
             <div className="text-center">
               <div className="text-6xl mb-4">🎭</div>
               <div>O Teatro da Descoberta aguarda sua consulta</div>
@@ -81,7 +81,7 @@ export function CinemaScreen({ activeTab, sessionData, isThinking }: CinemaScree
             <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
             <div className="text-sm font-mono">SESSÃO ATIVA</div>
           </div>
-          <div className="text-xs text-gray-500 font-mono">
+          <div className="text-xs text-gray-400 font-mono">
             {sessionData?.sessionId ? `#${sessionData.sessionId}` : 'INICIANDO...'}
           </div>
         </div>

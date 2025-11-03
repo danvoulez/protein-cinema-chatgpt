@@ -26,10 +26,18 @@ export function ConsultationChat({
   const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE])
   const [input, setInput] = useState('')
   const listRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
   }, [messages])
+
+  // Focus input after simulation completes
+  useEffect(() => {
+    if (!onThinkingState && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 100)
+    }
+  }, [onThinkingState])
 
   async function handleSend() {
     const trimmed = sanitizeUserInput(input)
@@ -161,10 +169,11 @@ TER`
         aria-label="Enviar mensagem"
       >
         <input
+          ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Descreva a hipótese ou cole FASTA..."
-          className="flex-1 bg-gray-900 text-gray-100 rounded-xl px-3 py-2 outline-none border border-gray-700 focus:border-cyan-500"
+          className="flex-1 bg-gray-900 text-gray-100 rounded-xl px-3 py-2 outline-none border border-gray-700 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/50"
           aria-label="Campo de entrada do chat"
         />
         <button

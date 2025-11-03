@@ -1,7 +1,7 @@
 // components/ConsultationMode.tsx
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { ConsultationChat } from './ConsultationChat'
 import { CinemaScreen } from './CinemaScreen'
 import { BottomMenu } from './BottomMenu'
@@ -16,7 +16,7 @@ export function ConsultationMode() {
   const [isThinking, setIsThinking] = useState(false)
   
   const touchStart = useRef<number | null>(null)
-  const tabs: Array<typeof activeTab> = ['simulation', 'analysis', 'replay', 'manifesto']
+  const tabs: Array<typeof activeTab> = useMemo(() => ['simulation', 'analysis', 'replay', 'manifesto'], [])
 
   // Efeito de transição cinematográfica
   useEffect(() => {
